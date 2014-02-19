@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
     # PPA publishing is optional
     ppa = None
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         ppa = sys.argv[3]
 
     # parse the upstream version and package name from the changelog
