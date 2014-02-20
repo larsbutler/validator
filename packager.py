@@ -2,6 +2,7 @@ import subprocess as sp
 import sys
 
 from datetime import datetime as dt
+from debian import changelog
 
 
 DEFAULT_RELEASE = 1
@@ -105,8 +106,8 @@ if __name__ == "__main__":
         ppa = sys.argv[3]
 
     # parse the upstream version and package name from the changelog
-    pkg_name = sp.check_output(['dpkg-parsechangelog',
-                                '--show-field', 'Source'])
-    version = sp.check_output(['dpkg-parsechangelog',
-                               '--show-field', 'Version'])
+    with open('debian/changelog') as cl_fp:
+        cl = changelog.Changelog(cl_fp)
+        pkg_name = cl.get_package()
+        version = cl.version.upstream_version
     latest_package(fullname, email, pkg_name, version, ppa=ppa)
