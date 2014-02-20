@@ -5,23 +5,6 @@ from datetime import datetime as dt
 from debian import changelog
 
 
-#: This changelog template produces a changelog entry,
-#: which looks like the following:
-#:
-#: zvm-validator (0.9-20140129134254-gitfdf17c3) precise; urgency=low
-#:
-#:   * Add packaging scripts
-#:
-#: -- Lars Butler (larsbutler) <lars.butler@gmail.com>  Wed, 29 Jan 2014 13:42:54 +0000
-#:
-CHANGELOG_TEMPLATE = """\
-%(pkg_name)s (%(version)s-%(dt_int)s-git%(short_hash)s-%(release)s) precise; urgency=low
-
-  * %(merge_msg)s
-
- -- %(debfullname)s <%(debemail)s>  %(full_datetime)s
-
-"""
 DEFAULT_RELEASE = 1
 
 
@@ -101,26 +84,10 @@ def _update_changelog(short_hash, merge_msg, fullname, email, pkg_name,
     """
     Re-write the changelog, prepending the new generated entry.
     """
-    changelog_entry = CHANGELOG_TEMPLATE % dict(
-        pkg_name=pkg_name,
-        version=version,
-        # year month day hour minute second,
-        # which makes this revision number easy to sort by time
-        dt_int=now.strftime('%Y%m%d%H%M%S'),
-        short_hash=short_hash,
-        merge_msg=merge_msg,
-        debfullname=fullname,
-        debemail=email,
-        full_datetime=now.strftime('%a, %d %b %Y %H:%M:%S +0000'),
-        release=DEFAULT_RELEASE,
-    )
-
-    changelog_file = 'debian/changelog'
-    with open(changelog_file) as fh:
-        cl_content = fh.read()
-    with open(changelog_file, 'w') as fh:
-        fh.write(changelog_entry)
-        fh.write(cl_content)
+    new_version = '%s-%s-git%s-%s' % (version, now.strftime('%Y%m%d%H%M%S'),
+                                      short_hash, DEFAULT_RELEASE)
+    sp.check_call(['dch', '-v', new_version, merge_msg],
+                  env={'DEBFULLNAME': fullname, 'DEBEMAIL': email})
 
 
 if __name__ == "__main__":
